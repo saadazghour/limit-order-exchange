@@ -20,7 +20,7 @@ This project is a full-stack technical assessment to build a miniature limit-ord
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/saadazghour/limit-order-exchange.git
     cd limit-order-exchange
     ```
 
@@ -76,4 +76,3 @@ This project is a full-stack technical assessment to build a miniature limit-ord
     To run the backend and frontend servers concurrently:
     - **Terminal 1 (Backend):** `php artisan serve`
     - **Terminal 2 (Frontend):** `yarn run dev`
-- 
