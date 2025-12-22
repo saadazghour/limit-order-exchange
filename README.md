@@ -40,7 +40,7 @@ This project is a full-stack technical assessment to build a miniature limit-ord
     ```
 
 5.  **Configure `.env` file:**
-    Update the following variables in your `.env` file with your local environment's details:
+    Update the following variables in your `backend/.env` file with your local environment's details:
     ```ini
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
