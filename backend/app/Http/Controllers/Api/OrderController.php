@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Resources\OrderResource;
+use App\Jobs\MatchOrderJob;
 use App\Models\Asset;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -71,11 +72,12 @@ class OrderController extends Controller
 
             $order->save();
 
-            // TODO: Dispatch MatchOrderJob after saving the order
-            // MatchOrderJob::dispatch($order);
+            MatchOrderJob::dispatch($order);
 
             return OrderResource::make($order);
         });
+    }
+
     /**
      * Cancel an open order.
      */
