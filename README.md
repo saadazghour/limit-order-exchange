@@ -14,6 +14,29 @@ This project is a full-stack technical assessment to build a miniature limit-ord
 
 ## Phase 1: Foundation & Project Setup
 
+### Phase 2: Backend Core Logic (The Exchange Engine)
+
+#### How to Test This Phase
+
+1.  **Ensure MySQL Container is Running:**
+    ```bash
+    docker start mysql-for-laravel
+    docker ps # Verify it's running
+    ```
+2.  **Navigate to the Backend Directory:**
+    ```bash
+    cd backend
+    ```
+3.  **Run Migrations:**
+    ```bash
+    php artisan migrate
+    ```
+    You should see output indicating that all new migrations (add_balance_to_users_table, create_assets_table, create_orders_table, create_trades_table) have run successfully.
+4.  **Verify Database Structure (Optional):**
+    You can connect to your MySQL database using a client (like MySQL Workbench, DataGrip, or the command line) and verify that:
+    - The `users` table now has a `balance` column.
+    - The `assets`, `orders`, and `trades` tables exist with the defined columns.
+
 ## General Setup Instructions
 
 ### Backend Setup
