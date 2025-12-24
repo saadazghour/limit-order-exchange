@@ -62,7 +62,6 @@ class MatchingService
                 // 2. Handle Buyer: receive asset, give USD
                 $buyerAsset = Asset::where('user_id', $buyer->id)->where('symbol', $buyerOrder->symbol)->lockForUpdate()->firstOrCreate(['user_id' => $buyer->id, 'symbol' => $buyerOrder->symbol]);
                 $buyerAsset->amount += $tradeAmount;
-                // If buyer overpaid (their buy price was higher), refund the difference
                 $buyer->balance += ($buyerOrder->price * $tradeAmount) - $tradeValue;
                 $buyer->save();
                 $buyerAsset->save();
@@ -74,7 +73,7 @@ class MatchingService
                 $sellerOrder->save();
 
                 // 4. Create Trade record
-                Trade::create([
+                $trade = Trade::create([
                     'buyer_id' => $buyer->id,
                     'seller_id' => $seller->id,
                     'buy_order_id' => $buyerOrder->id,
@@ -85,8 +84,8 @@ class MatchingService
                     'commission_amount' => $commission,
                 ]);
 
-                // 5. Broadcast event (we will create this event next)
-                // OrderMatched::dispatch($buyer, $seller, $trade);
+                // 5. Broadcast event
+                OrderMatched::dispatch($trade);
 
                 Log::info("Trade matched and executed for order ID: {$order->id}");
             }
