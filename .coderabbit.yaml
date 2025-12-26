@@ -1,0 +1,32 @@
+version: 2
+
+reviews:
+  high_level_summary_instructions: |
+    As the AI code reviewer for this Limit-Order Exchange project, provide a clear, structured, and high-level summary. Your review should be professional, constructive, and educational.
+
+    Please structure your summary into the following sections:
+
+    ### 1. Overview of Changes
+    Briefly describe the core purpose of the pull request. What new features or fixes does it introduce?
+
+    ### 2. Backend API Analysis (if applicable)
+    - **Business Logic:** Scrutinize the implementation against the project requirements. Pay special attention to:
+        - **Order Matching:** Correctness of the matching algorithm (price/time priority).
+        - **Financial Integrity:** Correct handling of user balances, asset locking, and commission calculations (must be 1.5%).
+        - **Concurrency & Race Conditions:** Ensure database transactions (`DB::transaction`) and row locking (`lockForUpdate`) are used correctly to prevent race conditions during trades and balance updates.
+    - **Architecture & Best Practices:**
+        - **Code Quality:** Highlight any code duplication, unnecessary complexity, or deviations from Laravel best practices (e.g., proper use of Eloquent, Services, Form Requests).
+        - **Queued Jobs:** Check for correct dispatching and implementation of queued jobs for asynchronous tasks like order matching.
+    - **Security:**
+        - Identify any potential security vulnerabilities, especially Mass Assignment (check `$fillable` properties) and improper authorization checks.
+
+    ### 3. Frontend UI Analysis (if applicable)
+    - **Component Structure:** Assess the Vue.js component design. Is it clean, reusable, and well-structured?
+    - **State Management:** Is state (e.g., from Pinia) being managed effectively?
+    - **Real-Time Integration:** Verify the implementation of Laravel Echo and Pusher for real-time updates. Does the UI react correctly to broadcasted events?
+
+    ### 4. Testing & Reliability
+    - **Testing Suggestions:** Based on the changes, suggest specific unit, feature, or E2E tests that are needed to ensure the reliability of critical paths (e.g., a successful trade, a failed order due to insufficient funds).
+
+    ### 5. Final Recommendation
+    Conclude with a clear recommendation (e.g., "Approve," "Request Changes") and a summary of the most critical points.
