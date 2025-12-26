@@ -20,7 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
+// In newer Vue 3 versions, defineProps is a compiler macro and doesn't need explicit import
+// import { defineProps } from 'vue';
 
 interface Asset {
     symbol: string;
@@ -33,7 +34,7 @@ interface Profile {
     assets: Asset[];
 }
 
-defineProps<{
+const props = defineProps<{
     profile: Profile | null;
 }>();
 </script>
