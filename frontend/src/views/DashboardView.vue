@@ -39,9 +39,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'; // Keep ref, remove onMounted as it's not directly used here after cleanup
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import apiClient from '@/services/api';
+import echo from '@/services/echo'; // Import Laravel Echo
 import LimitOrderForm from '@/components/LimitOrderForm.vue';
 import WalletOverview from '@/components/WalletOverview.vue';
 import OrdersList from '@/components/OrdersList.vue';
@@ -57,6 +58,7 @@ interface Profile {
     name: string;
     balance: string;
     assets: Asset[];
+    id: number; // Add id for private channel
 }
 
 const profile = ref<Profile | null>(null);
@@ -69,10 +71,26 @@ const fetchProfile = async () => {
     try {
         const response = await apiClient.get('/api/profile');
         profile.value = response.data.data;
+        // Subscribe to private channel after fetching user ID
+        if (profile.value && profile.value.id) {
+            setupRealtimeListener(profile.value.id);
+        }
     } catch (err) {
         error.value = 'Failed to fetch profile data.';
         console.error(err);
     }
+};
+
+const setupRealtimeListener = (userId: number) => {
+    // Unsubscribe from previous channel if exists
+    echo.leave(`user.${userId}`);
+
+    // Subscribe to the user's private channel
+    echo.private(`user.${userId}`)
+        .listen('OrderMatched', (e: any) => {
+            console.log('OrderMatched event received:', e);
+            refreshData(); // Refresh all data when an order is matched
+        });
 };
 
 const refreshData = () => {
@@ -91,4 +109,12 @@ const logout = async () => {
 };
 
 onMounted(fetchProfile);
+
+onBeforeUnmount(() => {
+    // Unsubscribe from channel when component is unmounted
+    if (profile.value && profile.value.id) {
+        echo.leave(`user.${profile.value.id}`);
+    }
+});
 </script>
+
