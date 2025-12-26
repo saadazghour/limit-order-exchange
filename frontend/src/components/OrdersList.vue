@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, defineProps, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import apiClient from '@/services/api';
 
 interface Order {
@@ -58,6 +58,7 @@ interface Order {
 
 const props = defineProps<{
     refreshTrigger: number;
+    title: string;
 }>();
 
 const orders = ref<Order[]>([]);
@@ -66,8 +67,7 @@ const error = ref<string | null>(null);
 const fetchOrders = async () => {
     error.value = null;
     try {
-        // Fetching all orders for now. A symbol filter can be added.
-        const response = await apiClient.get('/api/orders', { params: { symbol: 'ALL' } }); // Adjust API if needed
+        const response = await apiClient.get('/api/orders', { params: { symbol: 'ALL' } });
         orders.value = response.data.data;
     } catch (err) {
         error.value = 'Failed to fetch orders.';

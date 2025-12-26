@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, defineEmits } from 'vue';
+import { reactive, ref } from 'vue';
 import apiClient from '@/services/api';
 
 const form = reactive({
