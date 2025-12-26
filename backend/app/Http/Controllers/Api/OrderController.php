@@ -23,10 +23,18 @@ class OrderController extends Controller
             'symbol' => ['required', 'string', 'max:10'],
         ]);
 
-        $orders = Order::where('symbol', $request->symbol)
-            ->where('status', Order::STATUS_OPEN)
-            ->oldest() // Match with oldest first
-            ->get();
+        $user = $request->user();
+
+        if ($request->symbol === 'ALL') {
+            // Fetch all orders for the authenticated user, newest first
+            $orders = $user->orders()->latest()->get();
+        } else {
+            // Fetch open orders for a specific symbol, oldest first (for order book)
+            $orders = Order::where('symbol', $request->symbol)
+                ->where('status', Order::STATUS_OPEN)
+                ->oldest()
+                ->get();
+        }
 
         return OrderResource::collection($orders);
     }
