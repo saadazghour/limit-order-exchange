@@ -1,40 +1,115 @@
 <template>
-    <div class="p-6 bg-white rounded-lg shadow-md">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">Wallet Overview</h3>
-        <div class="mt-5 border-t border-gray-200">
-            <dl class="divide-y divide-gray-200">
-                <div class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt class="text-sm font-medium text-gray-500">USD Balance</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">${{ profile?.balance }}</dd>
-                </div>
-                <div v-for="asset in profile?.assets" :key="asset.symbol" class="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-                    <dt class="text-sm font-medium text-gray-500">{{ asset.symbol }} Balance</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        Available: {{ asset.amount }} <br>
-                        Locked: {{ asset.locked_amount }}
-                    </dd>
-                </div>
-            </dl>
-        </div>
+  <div
+    class="relative flex flex-col text-gray-700 bg-white shadow-lg rounded-xl border border-gray-200"
+  >
+    <div
+      class="relative p-4 mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-gradient-to-tr from-gray-900 to-gray-800"
+    >
+      <h3 class="text-lg font-semibold">Wallet</h3>
     </div>
+    <div class="p-6">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-4">
+            <CurrencyDollarIcon class="h-6 w-6 text-green-500" />
+            <div>
+              <p class="text-sm font-semibold text-gray-900">USD Balance</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <p class="text-sm font-medium text-gray-900 font-mono">
+              ${{
+                profile
+                  ? parseFloat(profile.balance).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                  : "0.00"
+              }}
+            </p>
+          </div>
+        </div>
+
+        <div
+          v-if="profile && profile.assets.length > 0"
+          class="border-t border-gray-100 !my-4"
+        ></div>
+
+        <div v-if="profile && profile.assets.length" class="space-y-3">
+          <div
+            v-for="asset in profile.assets"
+            :key="asset.symbol"
+            class="flex items-center justify-between"
+          >
+            <div class="flex items-center gap-4">
+              <component
+                :is="getAssetIcon(asset.symbol)"
+                class="h-6 w-6"
+                :class="getAssetColor(asset.symbol)"
+              />
+              <div>
+                <p class="text-sm font-semibold text-gray-900">
+                  {{ asset.symbol }}
+                </p>
+              </div>
+            </div>
+            <div class="text-right font-mono text-sm">
+              <p
+                class="font-medium text-gray-900"
+                :title="`Available: ${asset.amount}`"
+              >
+                {{ parseFloat(asset.amount).toFixed(6) }}
+              </p>
+              <p
+                v-if="parseFloat(asset.locked_amount) > 0"
+                class="text-xs text-gray-500"
+                :title="`Locked: ${asset.locked_amount}`"
+              >
+                Locked: {{ parseFloat(asset.locked_amount).toFixed(6) }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div v-else class="text-sm text-center text-gray-400 py-8">
+          You have no crypto assets.
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-// In newer Vue 3 versions, defineProps is a compiler macro and doesn't need explicit import
-// import { defineProps } from 'vue';
+import {
+  CurrencyDollarIcon,
+  BoltIcon,
+  CpuChipIcon,
+} from "@heroicons/vue/24/solid";
+
+const assetIcons: { [key: string]: any } = {
+  BTC: BoltIcon,
+  ETH: CpuChipIcon,
+};
+const assetColors: { [key: string]: any } = {
+  BTC: { bg: "bg-yellow-100", text: "text-yellow-500" },
+  ETH: { bg: "bg-blue-100", text: "text-blue-500" },
+  DEFAULT: { bg: "bg-gray-100", text: "text-gray-500" },
+};
+
+const getAssetIcon = (symbol: string) => assetIcons[symbol] || CpuChipIcon;
+const getAssetColor = (symbol: string) =>
+  assetColors[symbol] || assetColors["DEFAULT"];
 
 interface Asset {
-    symbol: string;
-    amount: string;
-    locked_amount: string;
+  symbol: string;
+  amount: string;
+  locked_amount: string;
 }
-
 interface Profile {
-    balance: string;
-    assets: Asset[];
+  balance: string;
+  assets: Asset[];
 }
 
-const props = defineProps<{
-    profile: Profile | null;
+defineProps<{
+  profile: Profile | null;
 }>();
 </script>

@@ -1,120 +1,129 @@
 <template>
-    <div class="min-h-screen bg-gray-50">
-        <!-- Header -->
-        <header class="bg-white shadow-sm">
-            <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center">
-                        <h1 class="text-xl font-bold text-gray-900">Limit-Order Exchange</h1>
-                    </div>
-                    <div class="flex items-center">
-                         <span v-if="profile" class="mr-4 text-sm text-gray-600">Welcome, {{ profile.name }}!</span>
-                        <button @click="logout" class="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300">
-                            Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
+  <div class="min-h-screen bg-gray-100 text-gray-800">
+    <header class="bg-white shadow-sm sticky top-0 z-20">
+      <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center gap-4">
+            <svg
+              class="w-8 h-8 text-indigo-600"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h18"
+              />
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.5 3L21 7.5m0 0L16.5 12M21 7.5H3"
+              />
+            </svg>
+            <h1 class="text-xl font-semibold text-gray-900">
+              Limit-Order Exchange
+            </h1>
+          </div>
+          <div>
+            <button
+              @click="logout"
+              class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
 
-        <!-- Main Content -->
-        <main class="py-10">
-            <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
-                    <!-- Left Column -->
-                    <div class="space-y-8 lg:col-span-1">
-                        <WalletOverview :profile="profile" />
-                        <OrdersList :refresh-trigger="refreshTrigger" title="My Order History" />
-                    </div>
+    <main class="py-12 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
+      <div
+        class="mx-auto w-full px-4 sm:px-6 lg:px-8"
+        style="max-width: 1280px"
+      >
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Top-Left: Order Book -->
+          <OrderBook :symbol="'BTC/USD'" :refresh-trigger="refreshTrigger" />
 
-                    <!-- Right Column -->
-                    <div class="space-y-8 lg:col-span-2">
-                        <LimitOrderForm @order-placed="refreshData" />
-                        <OrderBook :symbol="'BTC/USD'" :refresh-trigger="refreshTrigger" />
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
+          <!-- Top-Right: Wallet Overview -->
+          <WalletOverview :profile="profile" />
+
+          <!-- Bottom-Left: Limit Order Form -->
+          <LimitOrderForm @order-placed="refreshData" />
+
+          <!-- Bottom-Right: Order History -->
+          <OrdersList
+            :refresh-trigger="refreshTrigger"
+            title="My Order History"
+          />
+        </div>
+      </div>
+    </main>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
-import apiClient from '@/services/api';
-import echo from '@/services/echo'; // Import Laravel Echo
-import LimitOrderForm from '@/components/LimitOrderForm.vue';
-import WalletOverview from '@/components/WalletOverview.vue';
-import OrdersList from '@/components/OrdersList.vue';
-import OrderBook from '@/components/OrderBook.vue';
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import { useRouter } from "vue-router";
+import apiClient from "@/services/api";
+import echo from "@/services/echo";
+import LimitOrderForm from "@/components/LimitOrderForm.vue";
+import WalletOverview from "@/components/WalletOverview.vue";
+import OrdersList from "@/components/OrdersList.vue";
+import OrderBook from "@/components/OrderBook.vue";
 
 interface Asset {
-    symbol: string;
-    amount: string;
-    locked_amount: string;
+  symbol: string;
+  amount: string;
+  locked_amount: string;
 }
-
 interface Profile {
-    name: string;
-    balance: string;
-    assets: Asset[];
-    id: number; // Add id for private channel
+  id: number;
+  name: string;
+  balance: string;
+  assets: Asset[];
 }
 
 const profile = ref<Profile | null>(null);
-const error = ref<string | null>(null);
-const refreshTrigger = ref(0);
 const router = useRouter();
+const refreshTrigger = ref(0);
 
 const fetchProfile = async () => {
-    error.value = null;
-    try {
-        const response = await apiClient.get('/api/profile');
-        profile.value = response.data.data;
-        // Subscribe to private channel after fetching user ID
-        if (profile.value && profile.value.id) {
-            setupRealtimeListener(profile.value.id);
-        }
-    } catch (err) {
-        error.value = 'Failed to fetch profile data.';
-        console.error(err);
-    }
-};
-
-const setupRealtimeListener = (userId: number) => {
-    // Unsubscribe from previous channel if exists
-    echo.leave(`user.${userId}`);
-
-    // Subscribe to the user's private channel
-    echo.private(`user.${userId}`)
-        .listen('OrderMatched', (e: any) => {
-            console.log('OrderMatched event received:', e);
-            refreshData(); // Refresh all data when an order is matched
-        });
+  try {
+    const response = await apiClient.get("/api/profile");
+    profile.value = response.data.data;
+    if (profile.value) setupRealtimeListener(profile.value.id);
+  } catch (err) {
+    console.error("Failed to fetch profile data:", err);
+  }
 };
 
 const refreshData = () => {
-    console.log('Refreshing data...');
-    fetchProfile();
-    refreshTrigger.value++;
+  fetchProfile();
+  refreshTrigger.value++;
+};
+
+const setupRealtimeListener = (userId: number) => {
+  echo.private(`user.${userId}`).listen(".OrderMatched", (e: any) => {
+    setTimeout(() => refreshData(), 500);
+  });
 };
 
 const logout = async () => {
-    try {
-        await apiClient.post('/logout');
-    } finally {
-        localStorage.removeItem('authToken');
-        router.push({ name: 'login' });
-    }
+  if (profile.value) echo.leave(`user.${profile.value.id}`);
+  try {
+    await apiClient.post("/logout");
+  } finally {
+    localStorage.removeItem("authToken");
+    router.push({ name: "login" });
+  }
 };
 
 onMounted(fetchProfile);
-
 onBeforeUnmount(() => {
-    // Unsubscribe from channel when component is unmounted
-    if (profile.value && profile.value.id) {
-        echo.leave(`user.${profile.value.id}`);
-    }
+  if (profile.value) echo.leave(`user.${profile.value.id}`);
 });
 </script>
-

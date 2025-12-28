@@ -1,74 +1,153 @@
 <template>
-    <div class="p-6 bg-white rounded-lg shadow-md">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">Place an Order</h3>
-        <form @submit.prevent="placeOrder" class="mt-6 space-y-4">
-            <div>
-                <label for="symbol" class="block text-sm font-medium text-gray-700">Symbol</label>
-                <select v-model="form.symbol" id="symbol" name="symbol"
-                        class="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option>BTC</option>
-                    <option>ETH</option>
-                </select>
-            </div>
-            <div>
-                <label for="side" class="block text-sm font-medium text-gray-700">Side</label>
-                <select v-model="form.side" id="side" name="side"
-                        class="block w-full py-2 pl-3 pr-10 mt-1 text-base border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-                    <option value="buy">Buy</option>
-                    <option value="sell">Sell</option>
-                </select>
-            </div>
-            <div>
-                <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
-                <input v-model="form.price" id="price" name="price" type="number" step="0.01"
-                       class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div>
-                <label for="amount" class="block text-sm font-medium text-gray-700">Amount</label>
-                <input v-model="form.amount" id="amount" name="amount" type="number" step="0.0001"
-                       class="block w-full px-3 py-2 mt-1 placeholder-gray-400 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
-            </div>
-            <div v-if="error" class="text-sm text-red-600">
-                {{ error }}
-            </div>
-            <div>
-                <button type="submit"
-                        class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Place Order
-                </button>
-            </div>
-        </form>
+  <div
+    class="relative flex flex-col text-gray-700 bg-white shadow-lg rounded-xl border border-gray-200"
+  >
+    <div
+      class="relative p-4 mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-gradient-to-tr from-gray-900 to-gray-800"
+    >
+      <h3 class="text-lg font-semibold">Place New Order</h3>
     </div>
+    <form @submit.prevent="placeOrder" class="p-6">
+      <div class="space-y-6">
+        <fieldset>
+          <div class="flex rounded-md">
+            <label
+              :class="
+                form.side === 'buy'
+                  ? 'bg-green-500 text-white border-green-500 z-10 ring-2 ring-green-400'
+                  : 'text-gray-700 bg-white hover:bg-gray-50 border-gray-300'
+              "
+              class="relative flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border rounded-l-md cursor-pointer focus:outline-none"
+            >
+              <input
+                type="radio"
+                v-model="form.side"
+                value="buy"
+                class="sr-only"
+              />
+              <span>Buy</span>
+            </label>
+            <label
+              :class="
+                form.side === 'sell'
+                  ? 'bg-red-500 text-white border-red-500 z-10 ring-2 ring-red-400'
+                  : 'text-gray-700 bg-white hover:bg-gray-50 border-gray-300'
+              "
+              class="relative -ml-px flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border rounded-r-md cursor-pointer focus:outline-none"
+            >
+              <input
+                type="radio"
+                v-model="form.side"
+                value="sell"
+                class="sr-only"
+              />
+              <span>Sell</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div>
+          <label
+            for="symbol"
+            class="block text-sm font-medium leading-6 text-gray-900"
+            >Asset</label
+          >
+          <select
+            v-model="form.symbol"
+            id="symbol"
+            class="mt-2 block w-full rounded-md border-0 py-2 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-indigo-600 sm:text-sm sm:leading-6"
+          >
+            <option>BTC</option>
+            <option>ETH</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label
+              for="price"
+              class="block text-sm font-medium leading-6 text-gray-900"
+              >Price</label
+            >
+            <div class="mt-2">
+              <input
+                v-model="form.price"
+                id="price"
+                type="number"
+                step="0.01"
+                placeholder="Price (USD)"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+          <div>
+            <label
+              for="amount"
+              class="block text-sm font-medium leading-6 text-gray-900"
+              >Amount</label
+            >
+            <div class="mt-2">
+              <input
+                v-model="form.amount"
+                id="amount"
+                type="number"
+                step="0.0001"
+                placeholder="Amount"
+                class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="error" class="mt-4 text-sm text-center text-red-500">
+        {{ error }}
+      </div>
+
+      <div class="pt-6">
+        <button
+          type="submit"
+          :class="
+            form.side === 'buy'
+              ? 'bg-gradient-to-tr from-green-600 to-green-400 text-white shadow-md shadow-green-500/20 hover:shadow-lg hover:shadow-green-500/40'
+              : 'bg-gradient-to-tr from-red-600 to-red-400 text-white shadow-md shadow-red-500/20 hover:shadow-lg hover:shadow-red-500/40'
+          "
+          class="w-full select-none rounded-lg py-3 px-6 text-center align-middle font-sans text-xs font-bold uppercase transition-all focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] active:shadow-none"
+        >
+          Place {{ form.side }} Order
+        </button>
+      </div>
+    </form>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
-import apiClient from '@/services/api';
+import { reactive, ref } from "vue";
+import apiClient from "@/services/api";
 
 const form = reactive({
-    symbol: 'BTC',
-    side: 'buy',
-    price: '',
-    amount: ''
+  symbol: "BTC",
+  side: "buy",
+  price: "",
+  amount: "",
 });
 
 const error = ref<string | null>(null);
-const emit = defineEmits(['orderPlaced']);
+const emit = defineEmits(["orderPlaced"]);
 
 const placeOrder = async () => {
-    error.value = null;
-    try {
-        await apiClient.post('/api/orders', form);
-        // Reset form and emit event on success
-        form.price = '';
-        form.amount = '';
-        emit('orderPlaced');
-    } catch (err: any) {
-        if (err.response && err.response.data.message) {
-            error.value = err.response.data.message;
-        } else {
-            error.value = 'Failed to place order.';
-        }
+  error.value = null;
+  try {
+    await apiClient.post("/api/orders", form);
+    form.price = "";
+    form.amount = "";
+    emit("orderPlaced");
+  } catch (err: any) {
+    if (err.response && err.response.data && err.response.data.message) {
+      error.value = err.response.data.message;
+    } else {
+      error.value = "Failed to place order.";
     }
+  }
 };
 </script>

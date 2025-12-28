@@ -1,95 +1,200 @@
 <template>
-    <div class="p-6 mt-8 bg-white rounded-lg shadow-md">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">My Orders</h3>
-        <div class="mt-4">
-            <!-- Order filtering controls can be added here in the future -->
-        </div>
-        <div class="mt-4 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-            <div class="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                <div class="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                    <table class="min-w-full divide-y divide-gray-300">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Symbol</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Side</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Amount</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Status</th>
-                                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
-                                    <span class="sr-only">Cancel</span>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            <tr v-for="order in orders" :key="order.id">
-                                <td class="py-4 pl-4 pr-3 text-sm font-medium text-gray-900 whitespace-nowrap sm:pl-6">{{ order.symbol }}</td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">{{ order.side }}</td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">{{ order.price }}</td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">{{ order.amount }}</td>
-                                <td class="px-3 py-4 text-sm text-gray-500 whitespace-nowrap">{{ getStatusText(order.status) }}</td>
-                                <td class="relative py-4 pl-3 pr-4 text-sm font-medium text-right whitespace-nowrap sm:pr-6">
-                                    <button v-if="order.status === 1" @click="cancelOrder(order.id)"
-                                            class="text-indigo-600 hover:text-indigo-900">Cancel</button>
-                                </td>
-                            </tr>
-                            <tr v-if="orders.length === 0">
-                                <td colspan="6" class="px-3 py-4 text-sm text-center text-gray-500">No orders found.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+  <div
+    class="relative flex flex-col w-full h-full text-gray-700 bg-white shadow-xl rounded-xl border border-gray-200"
+  >
+    <div
+      class="relative p-4 mx-4 -mt-6 overflow-hidden text-white shadow-lg bg-clip-border rounded-xl bg-gradient-to-tr from-gray-900 to-gray-800"
+    >
+      <h3 class="text-lg font-semibold">{{ title }}</h3>
     </div>
+    <div class="p-0 overflow-x-auto">
+      <table class="w-full text-left table-auto min-w-max">
+        <thead>
+          <tr>
+            <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+              <p
+                class="font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70"
+              >
+                Order Details
+              </p>
+            </th>
+            <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+              <p
+                class="font-sans text-sm antialiased font-normal leading-none text-blue-gray-900 opacity-70"
+              >
+                Date
+              </p>
+            </th>
+            <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+              <p
+                class="font-sans text-sm antialiased font-normal leading-none text-center text-blue-gray-900 opacity-70"
+              >
+                Status
+              </p>
+            </th>
+            <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+              <p
+                class="font-sans text-sm antialiased font-normal leading-none text-right text-blue-gray-900 opacity-70"
+              >
+                Total Value
+              </p>
+            </th>
+            <th class="p-4 border-b border-blue-gray-100 bg-blue-gray-50">
+              <p
+                class="font-sans text-sm antialiased font-normal leading-none text-right text-blue-gray-900 opacity-70"
+              >
+                Action
+              </p>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="order in orders" :key="order.id" class="hover:bg-gray-50">
+            <td class="p-4 border-b border-blue-gray-50">
+              <div class="flex flex-col">
+                <p
+                  class="font-sans text-sm antialiased font-bold leading-normal text-blue-gray-900"
+                >
+                  {{ order.symbol }}/USD
+                </p>
+                <p
+                  class="font-sans text-xs antialiased font-normal"
+                  :class="
+                    order.side === 'buy' ? 'text-green-600' : 'text-red-600'
+                  "
+                >
+                  {{ order.side.toUpperCase() }} |
+                  {{ parseFloat(order.amount).toFixed(6) }} @ ${{
+                    parseFloat(order.price).toFixed(2)
+                  }}
+                </p>
+              </div>
+            </td>
+            <td class="p-4 border-b border-blue-gray-50">
+              <p
+                class="font-sans text-sm antialiased font-normal text-blue-gray-900"
+              >
+                {{ formatDate(order.created_at) }}
+              </p>
+            </td>
+            <td class="p-4 border-b border-blue-gray-50 text-center">
+              <span
+                class="inline-flex items-center px-2 py-1 text-xs font-medium rounded-full"
+                :class="getStatusClass(order.status)"
+              >
+                {{ getStatusText(order.status) }}
+              </span>
+            </td>
+            <td class="p-4 border-b border-blue-gray-50 text-right">
+              <p
+                class="font-sans text-sm font-medium text-blue-gray-900 font-mono"
+              >
+                ${{
+                  (parseFloat(order.price) * parseFloat(order.amount)).toFixed(
+                    2,
+                  )
+                }}
+              </p>
+            </td>
+            <td class="p-4 border-b border-blue-gray-50 text-right">
+              <button
+                v-if="order.status === 1"
+                @click="cancelOrder(order.id)"
+                class="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
+              >
+                Cancel
+              </button>
+            </td>
+          </tr>
+          <tr v-if="orders.length === 0">
+            <td
+              colspan="5"
+              class="p-4 py-16 text-sm text-center text-gray-500 border-b border-blue-gray-50"
+            >
+              You have no order history.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
-import apiClient from '@/services/api';
+import { ref, onMounted, watch } from "vue";
+import apiClient from "@/services/api";
 
 interface Order {
-    id: number;
-    symbol: string;
-    side: string;
-    price: string;
-    amount: string;
-    status: number;
+  id: number;
+  symbol: string;
+  side: string;
+  price: string;
+  amount: string;
+  status: number;
+  created_at: string;
 }
 
 const props = defineProps<{
-    refreshTrigger: number;
-    title: string;
+  refreshTrigger: number;
+  title: string;
 }>();
 
 const orders = ref<Order[]>([]);
-const error = ref<string | null>(null);
 
 const fetchOrders = async () => {
-    error.value = null;
-    try {
-        const response = await apiClient.get('/api/orders', { params: { symbol: 'ALL' } });
-        orders.value = response.data.data;
-    } catch (err) {
-        error.value = 'Failed to fetch orders.';
-    }
+  try {
+    const response = await apiClient.get("/api/orders", {
+      params: { symbol: "ALL" },
+    });
+    orders.value = response.data.data;
+  } catch (err) {
+    console.error("Failed to fetch orders:", err);
+  }
 };
 
 const cancelOrder = async (orderId: number) => {
-    try {
-        await apiClient.post(`/api/orders/${orderId}/cancel`);
-        await fetchOrders(); // Re-fetch orders after cancellation
-    } catch (err) {
-        // Handle error
-    }
+  if (!confirm("Are you sure you want to cancel this order?")) return;
+  try {
+    await apiClient.post(`/api/orders/${orderId}/cancel`);
+    await fetchOrders();
+  } catch (err) {
+    alert("Failed to cancel order.");
+  }
 };
 
 const getStatusText = (status: number) => {
-    switch (status) {
-        case 1: return 'Open';
-        case 2: return 'Filled';
-        case 3: return 'Cancelled';
-        default: return 'Unknown';
-    }
+  switch (status) {
+    case 1:
+      return "Open";
+    case 2:
+      return "Filled";
+    case 3:
+      return "Cancelled";
+    default:
+      return "Unknown";
+  }
+};
+
+const getStatusClass = (status: number) => {
+  switch (status) {
+    case 1:
+      return "bg-blue-100 text-blue-800";
+    case 2:
+      return "bg-green-100 text-green-800";
+    case 3:
+      return "bg-gray-200 text-gray-800";
+    default:
+      return "bg-yellow-100 text-yellow-800";
+  }
+};
+
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 };
 
 onMounted(fetchOrders);
