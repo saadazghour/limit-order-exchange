@@ -84,3 +84,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Constrain inline SVGs to avoid unexpectedly large icons
+   Use a conservative default; add the class `svg-large` to
+   any SVG that should remain larger. */
+
+/* Reduce default inline SVG cap slightly so heroicons follow Tailwind sizing
+   but still allow large visuals when explicitly needed via `.svg-large`. */
+svg {
+  max-width: 40px;
+  max-height: 40px;
+  width: auto;
+  height: auto;
+}
+
+.svg-large {
+  max-width: none;
+  max-height: none;
+}
