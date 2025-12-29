@@ -10,64 +10,8 @@ This project is a full-stack technical assessment to build a miniature limit-ord
 - **Real-time:** Pusher via Laravel Broadcasting
 - **Styling:** Tailwind CSS
 
----
-
-### Phase 2: Backend Core Logic (The Exchange Engine)
-
-#### Pull Request Description
-
-**Title:** `feat(backend): Phase 2.3 - Matching Engine`
-
-**Description:**
-
-This PR implements the core matching engine for the limit-order exchange, along with real-time event broadcasting using Pusher.
-
-Key Changes:
--   **Matching Engine Job:** Created a `MatchOrderJob` that is dispatched whenever a new order is created. This job handles the core matching logic:
-    -   Finds the first valid counter-order based on price and time.
-    -   Executes the trade within a database transaction, updating balances for both buyer and seller.
-    -   Deducts a 1.5% commission from the trade.
-    -   Updates the status of both matched orders to "filled".
--   **Real-Time Broadcasting:**
-    -   Created an `OrderMatched` event that is broadcast on a private Pusher channel (`private-user.{id}`) for both the buyer and seller upon a successful match.
--   **Service Layer:** Added a dedicated `MatchingService` to encapsulate the complex matching logic, keeping the controller clean and focused.
-
-This PR completes the backend business logic for order matching and real-time notifications.
-
-#### How to Test This Phase
-
-1.  **Ensure MySQL Container is Running:**
-    ```bash
-    docker start mysql-for-laravel
-    docker ps
-    ```
-2.  **Ensure a Queue Worker is Running:**
-    In a separate terminal, start the queue worker to process jobs:
-    ```bash
-    cd backend && php artisan queue:work
-    ```
-3.  **Register and Log In:**
-    Use an API client (like Postman) to register two different users and log them both in to get their API tokens.
-4.  **Seed Initial Balance and Assets:**
-    To test matching, users need funds. For now, you can manually update the database:
-    -   In your MySQL client, give User 1 a balance: `UPDATE users SET balance = 100000.00 WHERE id = 1;`
-    -   Give User 2 some assets: `INSERT INTO assets (user_id, symbol, amount) VALUES (2, 'BTC', 1.0);`
-5.  **Create Orders:**
-    -   **User 2 (Seller):** Create a sell order for BTC.
-        -   **Endpoint:** `http://127.0.0.1:8000/api/orders` (POST)
-        -   **Headers:** `Authorization: Bearer <USER_2_TOKEN>`
-        -   **Body:** `{"symbol": "BTC", "side": "sell", "price": "50000.00", "amount": "0.1"}`
-    -   **User 1 (Buyer):** Create a matching buy order for BTC.
-        -   **Endpoint:** `http://127.0.0.1:8000/api/orders` (POST)
-        -   **Headers:** `Authorization: Bearer <USER_1_TOKEN>`
-        -   **Body:** `{"symbol": "BTC", "side": "buy", "price": "50000.00", "amount": "0.1"}`
-6.  **Verify Match:**
-    -   **Queue Worker Terminal:** You should see the `MatchOrderJob` being processed successfully.
-    -   **Pusher Debug Console:** Check your Pusher dashboard's Debug Console. You should see the `OrderMatched` event being broadcast on the private channels for both User 1 and User 2.
-    -   **Database:** Check the `orders` table to see if the status of both orders is now "filled". Check the `trades` table for a new entry. Check the `users` and `assets` tables to see if balances and asset amounts have been updated correctly (including the 1.5% commission).
-
                                          │
-### Phase 2: Backend Core Logic (API Endpoints)
+### Phase 1: Backend Core Logic (API Endpoints)
 
 #### How to Test This Phase
 
