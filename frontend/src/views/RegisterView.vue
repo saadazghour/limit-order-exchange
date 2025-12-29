@@ -4,14 +4,14 @@
       <h2 class="text-2xl font-bold text-center text-gray-900">
         Create a new account
       </h2>
-      <form @submit.prevent="handleRegister" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleRegister">
         <div>
           <label for="name" class="block text-sm font-medium text-gray-700"
             >Name</label
           >
           <input
-            v-model="form.name"
             id="name"
+            v-model="form.name"
             name="name"
             type="text"
             autocomplete="name"
@@ -24,8 +24,8 @@
             >Email address</label
           >
           <input
-            v-model="form.email"
             id="email"
+            v-model="form.email"
             name="email"
             type="email"
             autocomplete="email"
@@ -38,8 +38,8 @@
             >Password</label
           >
           <input
-            v-model="form.password"
             id="password"
+            v-model="form.password"
             name="password"
             type="password"
             autocomplete="new-password"
@@ -54,8 +54,8 @@
             >Confirm Password</label
           >
           <input
-            v-model="form.password_confirmation"
             id="password_confirmation"
+            v-model="form.password_confirmation"
             name="password_confirmation"
             type="password"
             autocomplete="new-password"
@@ -89,37 +89,37 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import apiClient from "@/services/api";
+import { reactive, ref } from "vue"
+import { useRouter } from "vue-router"
+import apiClient from "@/services/api"
 
 const form = reactive({
   name: "",
   email: "",
   password: "",
   password_confirmation: "",
-});
+})
 
-const error = ref<string | null>(null);
-const router = useRouter();
+const error = ref<string | null>(null)
+const router = useRouter()
 
 const handleRegister = async () => {
-  error.value = null;
+  error.value = null
   try {
     // First, get the CSRF cookie
-    await apiClient.get("/sanctum/csrf-cookie");
+    await apiClient.get("/sanctum/csrf-cookie")
 
     // Then, attempt to register
-    await apiClient.post("/register", form);
+    await apiClient.post("/register", form)
 
     // After successful registration, redirect to login
-    await router.push({ name: "login" });
+    await router.push({ name: "login" })
   } catch (err: any) {
     if (err.response && err.response.data.message) {
-      error.value = err.response.data.message;
+      error.value = err.response.data.message
     } else {
-      error.value = "An unexpected error occurred during registration.";
+      error.value = "An unexpected error occurred during registration."
     }
   }
-};
+}
 </script>

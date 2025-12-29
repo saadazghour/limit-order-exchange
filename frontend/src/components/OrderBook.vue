@@ -77,48 +77,48 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from "vue";
-import apiClient from "@/services/api.ts";
+import { ref, onMounted, computed, watch } from "vue"
+import apiClient from "@/services/api.ts"
 
 interface Order {
-  id: number;
-  price: string;
-  amount: string;
-  side: "buy" | "sell";
+  id: number
+  price: string
+  amount: string
+  side: "buy" | "sell"
 }
 
-const props = defineProps<{ symbol: string; refreshTrigger: number }>();
-const orders = ref<Order[]>([]);
+const props = defineProps<{ symbol: string; refreshTrigger: number }>()
+const orders = ref<Order[]>([])
 
 const bids = computed(() =>
   orders.value
-    .filter((o) => o.side === "buy")
+    .filter(o => o.side === "buy")
     .sort((a, b) => parseFloat(b.price) - parseFloat(a.price)),
-);
+)
 const asks = computed(() =>
   orders.value
-    .filter((o) => o.side === "sell")
+    .filter(o => o.side === "sell")
     .sort((a, b) => parseFloat(a.price) - parseFloat(b.price)),
-);
+)
 
 const fetchOrderBook = async () => {
   try {
     const response = await apiClient.get("/api/orders", {
       params: { symbol: props.symbol.split("/")[0] },
-    });
-    orders.value = response.data.data;
+    })
+    orders.value = response.data.data
   } catch (error) {
-    console.error("Failed to fetch order book:", error);
+    console.error("Failed to fetch order book:", error)
   }
-};
+}
 
 const formatPrice = (price: string) =>
   parseFloat(price).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
-  });
+  })
 
-onMounted(fetchOrderBook);
-watch(() => props.refreshTrigger, fetchOrderBook);
-watch(() => props.symbol, fetchOrderBook);
+onMounted(fetchOrderBook)
+watch(() => props.refreshTrigger, fetchOrderBook)
+watch(() => props.symbol, fetchOrderBook)
 </script>

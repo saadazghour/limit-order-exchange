@@ -83,33 +83,33 @@ import {
   CurrencyDollarIcon,
   BoltIcon,
   CpuChipIcon,
-} from "@heroicons/vue/24/solid";
+} from "@heroicons/vue/24/solid"
 
 const assetIcons: { [key: string]: any } = {
   BTC: BoltIcon,
   ETH: CpuChipIcon,
-};
+}
 const assetColors: { [key: string]: any } = {
   BTC: { bg: "bg-yellow-100", text: "text-yellow-500" },
   ETH: { bg: "bg-blue-100", text: "text-blue-500" },
   DEFAULT: { bg: "bg-gray-100", text: "text-gray-500" },
-};
+}
 
-const getAssetIcon = (symbol: string) => assetIcons[symbol] || CpuChipIcon;
+const getAssetIcon = (symbol: string) => assetIcons[symbol] || CpuChipIcon
 const getAssetColor = (symbol: string) =>
-  assetColors[symbol] || assetColors["DEFAULT"];
+  assetColors[symbol] || assetColors["DEFAULT"]
 
 interface Asset {
-  symbol: string;
-  amount: string;
-  locked_amount: string;
+  symbol: string
+  amount: string
+  locked_amount: string
 }
 interface Profile {
-  balance: string;
-  assets: Asset[];
+  balance: string
+  assets: Asset[]
 }
 
 defineProps<{
-  profile: Profile | null;
-}>();
+  profile: Profile | null
+}>()
 </script>

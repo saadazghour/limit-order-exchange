@@ -4,14 +4,14 @@
       <h2 class="text-2xl font-bold text-center text-gray-900">
         Login to your account
       </h2>
-      <form @submit.prevent="handleLogin" class="space-y-6">
+      <form class="space-y-6" @submit.prevent="handleLogin">
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700"
             >Email address</label
           >
           <input
-            v-model="form.email"
             id="email"
+            v-model="form.email"
             name="email"
             type="email"
             autocomplete="email"
@@ -24,8 +24,8 @@
             >Password</label
           >
           <input
-            v-model="form.password"
             id="password"
+            v-model="form.password"
             name="password"
             type="password"
             autocomplete="current-password"
@@ -59,40 +59,40 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import apiClient from "@/services/api";
+import { reactive, ref } from "vue"
+import { useRouter } from "vue-router"
+import apiClient from "@/services/api"
 
 const form = reactive({
   email: "",
   password: "",
-});
+})
 
-const error = ref<string | null>(null);
-const router = useRouter();
+const error = ref<string | null>(null)
+const router = useRouter()
 
 const handleLogin = async () => {
-  error.value = null;
+  error.value = null
   try {
     // First, get the CSRF cookie
-    await apiClient.get("/sanctum/csrf-cookie");
+    await apiClient.get("/sanctum/csrf-cookie")
 
     // Then, attempt to log in
-    const response = await apiClient.post("/login", form);
+    const response = await apiClient.post("/login", form)
 
     if (response.data.token) {
-      localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("authToken", response.data.token)
       // Redirect to the dashboard
-      await router.push({ name: "dashboard" });
+      await router.push({ name: "dashboard" })
     } else {
-      error.value = "Login failed: No token received.";
+      error.value = "Login failed: No token received."
     }
   } catch (err: any) {
     if (err.response && err.response.data.message) {
-      error.value = err.response.data.message;
+      error.value = err.response.data.message
     } else {
-      error.value = "An unexpected error occurred.";
+      error.value = "An unexpected error occurred."
     }
   }
-};
+}
 </script>

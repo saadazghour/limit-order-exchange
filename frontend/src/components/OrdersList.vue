@@ -86,9 +86,7 @@
               </span>
             </td>
             <td class="p-4 border-b border-blue-gray-50 text-right">
-              <p
-                class="font-sans text-sm font-medium text-blue-gray-900 font-mono"
-              >
+              <p class="font-sans text-sm font-medium text-blue-gray-900">
                 ${{
                   (parseFloat(order.price) * parseFloat(order.amount)).toFixed(
                     2,
@@ -99,8 +97,8 @@
             <td class="p-4 border-b border-blue-gray-50 text-right">
               <button
                 v-if="order.status === 1"
-                @click="cancelOrder(order.id)"
                 class="text-indigo-600 hover:text-indigo-900 font-semibold text-sm"
+                @click="cancelOrder(order.id)"
               >
                 Cancel
               </button>
@@ -121,82 +119,82 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import apiClient from "@/services/api.ts";
+import { ref, onMounted, watch } from "vue"
+import apiClient from "@/services/api.ts"
 
 interface Order {
-  id: number;
-  symbol: string;
-  side: string;
-  price: string;
-  amount: string;
-  status: number;
-  created_at: string;
+  id: number
+  symbol: string
+  side: string
+  price: string
+  amount: string
+  status: number
+  created_at: string
 }
 
 const props = defineProps<{
-  refreshTrigger: number;
-  title: string;
-}>();
+  refreshTrigger: number
+  title: string
+}>()
 
-const orders = ref<Order[]>([]);
+const orders = ref<Order[]>([])
 
 const fetchOrders = async () => {
   try {
     const response = await apiClient.get("/api/orders", {
       params: { symbol: "ALL" },
-    });
-    orders.value = response.data.data;
+    })
+    orders.value = response.data.data
   } catch (err) {
-    console.error("Failed to fetch orders:", err);
+    console.error("Failed to fetch orders:", err)
   }
-};
+}
 
 const cancelOrder = async (orderId: number) => {
-  if (!confirm("Are you sure you want to cancel this order?")) return;
+  if (!confirm("Are you sure you want to cancel this order?")) return
   try {
-    await apiClient.post(`/api/orders/${orderId}/cancel`);
-    await fetchOrders();
-  } catch (err) {
-    alert("Failed to cancel order.");
+    await apiClient.post(`/api/orders/${orderId}/cancel`)
+    await fetchOrders()
+  } catch (err: unknown) {
+    alert("Failed to cancel order.")
   }
-};
+}
 
 const getStatusText = (status: number) => {
   switch (status) {
     case 1:
-      return "Open";
+      return "Open"
     case 2:
-      return "Filled";
+      return "Filled"
     case 3:
-      return "Cancelled";
+      return "Cancelled"
     default:
-      return "Unknown";
+      return "Unknown"
   }
-};
+}
 
 const getStatusClass = (status: number) => {
   switch (status) {
     case 1:
-      return "bg-blue-100 text-blue-800";
+      return "bg-blue-100 text-blue-800"
     case 2:
-      return "bg-green-100 text-green-800";
+      return "bg-green-100 text-green-800"
     case 3:
-      return "bg-gray-200 text-gray-800";
+      return "bg-gray-200 text-gray-800"
     default:
-      return "bg-yellow-100 text-yellow-800";
+      return "bg-yellow-100 text-yellow-800"
   }
-};
+}
 
 const formatDate = (dateString: string) => {
-  const date = new Date(dateString);
+  const date = new Date(dateString)
   return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
     year: "numeric",
-  });
-};
+  })
+}
 
-onMounted(fetchOrders);
-watch(() => props.refreshTrigger, fetchOrders);
+onMounted(fetchOrders)
+watch(() => props.refreshTrigger, fetchOrders)
 </script>
