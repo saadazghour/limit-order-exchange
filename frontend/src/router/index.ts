@@ -1,7 +1,7 @@
-import { createRouter, createWebHistory } from "vue-router";
-import LoginView from "../views/LoginView.vue";
-import RegisterView from "../views/RegisterView.vue";
-import DashboardView from "../views/DashboardView.vue";
+import { createRouter, createWebHistory } from "vue-router"
+import LoginView from "../views/LoginView.vue"
+import RegisterView from "../views/RegisterView.vue"
+import DashboardView from "../views/DashboardView.vue"
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,18 +27,18 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
   ],
-});
+})
 
 router.beforeEach((to, from, next) => {
-  const loggedIn = localStorage.getItem("authToken");
+  const loggedIn = localStorage.getItem("authToken")
 
   if (to.meta.requiresAuth && !loggedIn) {
-    next({ name: "login" });
+    next({ name: "login" })
   } else if ((to.name === "login" || to.name === "register") && loggedIn) {
-    next({ name: "dashboard" });
+    next({ name: "dashboard" })
   } else {
-    next();
+    next()
   }
-});
+})
 
-export default router;
+export default router

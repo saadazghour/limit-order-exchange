@@ -19,7 +19,12 @@
               "
               class="relative flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border rounded-l-md cursor-pointer focus:outline-none"
             >
-              <input v-model="form.side" type="radio" value="buy" class="sr-only" />
+              <input
+                v-model="form.side"
+                type="radio"
+                value="buy"
+                class="sr-only"
+              />
               <span>Buy</span>
             </label>
             <label
@@ -30,14 +35,21 @@
               "
               class="relative -ml-px flex-1 flex items-center justify-center px-3 py-2 text-sm font-medium border rounded-r-md cursor-pointer focus:outline-none"
             >
-              <input v-model="form.side" type="radio" value="sell" class="sr-only" />
+              <input
+                v-model="form.side"
+                type="radio"
+                value="sell"
+                class="sr-only"
+              />
               <span>Sell</span>
             </label>
           </div>
         </fieldset>
 
         <div>
-          <label for="symbol" class="block text-sm font-medium leading-6 text-gray-900"
+          <label
+            for="symbol"
+            class="block text-sm font-medium leading-6 text-gray-900"
             >Asset</label
           >
           <select
@@ -52,7 +64,9 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label for="price" class="block text-sm font-medium leading-6 text-gray-900"
+            <label
+              for="price"
+              class="block text-sm font-medium leading-6 text-gray-900"
               >Price</label
             >
             <div class="mt-2">
@@ -67,7 +81,9 @@
             </div>
           </div>
           <div>
-            <label for="amount" class="block text-sm font-medium leading-6 text-gray-900"
+            <label
+              for="amount"
+              class="block text-sm font-medium leading-6 text-gray-900"
               >Amount</label
             >
             <div class="mt-2">
@@ -106,25 +122,35 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import apiClient from "@/services/api.ts";
-const form = reactive({ symbol: "BTC", side: "buy", price: "", amount: "" });
-const error = ref<string | null>(null);
-const emit = defineEmits(["orderPlaced"]);
+import { reactive, ref } from "vue"
+import apiClient from "@/services/api.ts"
+const form = reactive({ symbol: "BTC", side: "buy", price: "", amount: "" })
+const error = ref<string | null>(null)
+const emit = defineEmits(["orderPlaced"])
 
 const placeOrder = async () => {
-  error.value = null;
+  error.value = null
   try {
-    await apiClient.post("/api/orders", form);
-    form.price = "";
-    form.amount = "";
-    emit("orderPlaced");
-  } catch (err: any) {
-    if (err.response && err.response.data && err.response.data.message) {
-      error.value = err.response.data.message;
+    await apiClient.post("/api/orders", form)
+    form.price = ""
+    form.amount = ""
+    emit("orderPlaced")
+  } catch (err: unknown) {
+    if (
+      err &&
+      typeof err === "object" &&
+      "response" in err &&
+      err.response &&
+      typeof err.response === "object" &&
+      "data" in err.response &&
+      err.response.data &&
+      typeof err.response.data === "object" &&
+      "message" in err.response.data
+    ) {
+      error.value = (err.response.data as { message: string }).message
     } else {
-      error.value = "Failed to place order.";
+      error.value = "Failed to place order."
     }
   }
-};
+}
 </script>
