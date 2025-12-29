@@ -123,17 +123,7 @@
 
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import apiClient from "@/services/api";
-
-const form = reactive({
-  symbol: "BTC",
-  side: "buy",
-  price: "",
-  amount: "",
-});
-
-const error = ref<string | null>(null);
-const emit = defineEmits(["orderPlaced"]);
+import apiClient from "@/services/api.ts"; const form = reactive({ symbol: "BTC", side: "buy", price: "", amount: "", }); const error = ref<string | null>(null); const emit = defineEmits(["orderPlaced"]);
 
 const placeOrder = async () => {
   error.value = null;

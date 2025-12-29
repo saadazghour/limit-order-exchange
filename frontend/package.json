@@ -12,6 +12,7 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:e2e": "playwright test",
+     "format": "prettier --write \"src/**/*.{js,ts,vue,json,css,html}\"",
     "build-only": "vite build",
     "type-check": "vue-tsc --build"
   },
@@ -34,6 +35,7 @@
     "@vue/tsconfig": "^0.8.1",
     "jsdom": "^27.2.0",
     "npm-run-all2": "^8.0.4",
+    "prettier": "^3.7.4",
     "typescript": "~5.9.0",
     "vite": "^7.2.4",
     "vite-plugin-vue-devtools": "^8.0.5",

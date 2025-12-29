@@ -1,12 +1,17 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue"],
+  "extends": "@vue/tsconfig/tsconfig.dom.json", // Revert to extending Vue's DOM config
+  "include": ["env.d.ts", "shims-vue.d.ts", "src/**/*", "src/**/*.vue"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-
+    "composite": true,
+    "baseUrl": ".", // Set base URL relative to this file
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "allowSyntheticDefaultImports": true,
+    "jsx": "preserve",
+    "allowImportingTsExtensions": true,
+    "moduleResolution": "bundler"
   }
 }

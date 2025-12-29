@@ -23,9 +23,7 @@
                 d="M16.5 3L21 7.5m0 0L16.5 12M21 7.5H3"
               />
             </svg>
-            <h1 class="text-xl font-semibold text-gray-900">
-              Limit-Order Exchange
-            </h1>
+            <h1 class="text-xl font-semibold text-gray-900">Limit-Order Exchange</h1>
           </div>
           <div>
             <button
@@ -40,10 +38,7 @@
     </header>
 
     <main class="py-12 bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
-      <div
-        class="mx-auto w-full px-4 sm:px-6 lg:px-8"
-        style="max-width: 1280px"
-      >
+      <div class="mx-auto w-full px-4 sm:px-6 lg:px-8" style="max-width: 1280px">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <!-- Top-Left: Order Book -->
           <OrderBook :symbol="'BTC/USD'" :refresh-trigger="refreshTrigger" />
@@ -55,10 +50,7 @@
           <LimitOrderForm @order-placed="refreshData" />
 
           <!-- Bottom-Right: Order History -->
-          <OrdersList
-            :refresh-trigger="refreshTrigger"
-            title="My Order History"
-          />
+          <OrdersList :refresh-trigger="refreshTrigger" title="My Order History" />
         </div>
       </div>
     </main>
