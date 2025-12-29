@@ -9,8 +9,6 @@ This project is a full-stack technical assessment to build a miniature limit-ord
 - **Database:** MySQL or PostgreSQL
 - **Real-time:** Pusher via Laravel Broadcasting
 - **Styling:** Tailwind CSS
-
-                                         │
 ### Phase 1: Backend Core Logic (API Endpoints)
 
 #### How to Test This Phase
