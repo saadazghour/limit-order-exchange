@@ -2536,7 +2536,7 @@ kolorist@^1.8.0:
   resolved "https://registry.yarnpkg.com/kolorist/-/kolorist-1.8.0.tgz#edddbbbc7894bc13302cdf740af6374d4a04743c"
   integrity sha512-Y+60/zizpJ3HRH8DCss+q95yr6145JXZo46OTpFvDZWLfRCE4qChOyk1b26nMaNpfHHgxagk9dXT5OP0Tfe+dQ==
 
-laravel-echo@^2.2.6:
+laravel-echo@^2.2.7:
   version "2.2.7"
   resolved "https://registry.yarnpkg.com/laravel-echo/-/laravel-echo-2.2.7.tgz#72b19941c870805278807c46033778a199e6ecbc"
   integrity sha512-MgD3ZFXqH5OOVdRjxNHPyQ0ijRr5+nLr7MtyF2XP+kRfhl+Qaa7qVzbtCn1HMgXuTn4SWH6ivn4qWVLlvRl8kg==

@@ -61,6 +61,14 @@
           />
         </div>
       </div>
+      <!-- Toast Notification -->
+      <div
+        v-if="showToast"
+        class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-500"
+        :class="{ 'opacity-100': showToast, 'opacity-0': !showToast }"
+      >
+        {{ toastMessage }}
+      </div>
     </main>
   </div>
 </template>
@@ -90,6 +98,8 @@ interface Profile {
 const profile = ref<Profile | null>(null)
 const router = useRouter()
 const refreshTrigger = ref(0)
+const showToast = ref(false)
+const toastMessage = ref("")
 
 const fetchProfile = async () => {
   try {
@@ -106,9 +116,20 @@ const refreshData = () => {
   refreshTrigger.value++
 }
 
+const displayToast = (message: string) => {
+  toastMessage.value = message
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000) // Hide after 3 seconds
+}
+
 const setupRealtimeListener = (userId: number) => {
   echo.private(`user.${userId}`).listen(".OrderMatched", () => {
-    setTimeout(() => refreshData(), 500)
+    setTimeout(() => {
+      refreshData()
+      displayToast("Order matched successfully!") // Display toast
+    }, 500)
   })
 }
 
