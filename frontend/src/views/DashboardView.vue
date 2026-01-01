@@ -61,6 +61,14 @@
           />
         </div>
       </div>
+      <!-- Toast Notification -->
+      <div
+        v-show="showToast"
+        class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-500"
+        :class="{ 'opacity-100': showToast, 'opacity-0': !showToast }"
+      >
+        {{ toastMessage }}
+      </div>
     </main>
   </div>
 </template>
@@ -80,6 +88,7 @@ interface Asset {
   amount: string
   locked_amount: string
 }
+
 interface Profile {
   id: number
   name: string
@@ -90,6 +99,9 @@ interface Profile {
 const profile = ref<Profile | null>(null)
 const router = useRouter()
 const refreshTrigger = ref(0)
+const showToast = ref(false)
+const toastMessage = ref("")
+let toastTimeout: number | undefined
 
 const fetchProfile = async () => {
   try {
@@ -106,9 +118,30 @@ const refreshData = () => {
   refreshTrigger.value++
 }
 
+const displayToast = (message: string) => {
+  if (toastTimeout) clearTimeout(toastTimeout) // Clear any existing timeout
+
+  toastMessage.value = message
+  showToast.value = true
+
+  toastTimeout = setTimeout(() => {
+    showToast.value = false
+    toastTimeout = undefined
+  }, 3000) // Hide after 3 seconds
+}
+
+let realtimeTimeout: ReturnType<typeof setTimeout> | null = null
+
 const setupRealtimeListener = (userId: number) => {
+  echo.leave(`user.${userId}`) // Unsubscribe before re-subscribing
   echo.private(`user.${userId}`).listen(".OrderMatched", () => {
-    setTimeout(() => refreshData(), 500)
+    if (realtimeTimeout) clearTimeout(realtimeTimeout)
+
+    realtimeTimeout = setTimeout(() => {
+      refreshData()
+      displayToast("Order matched successfully!") // Display toast
+      realtimeTimeout = null
+    }, 500)
   })
 }
 
@@ -125,5 +158,7 @@ const logout = async () => {
 onMounted(fetchProfile)
 onBeforeUnmount(() => {
   if (profile.value) echo.leave(`user.${profile.value.id}`)
+  if (toastTimeout) clearTimeout(toastTimeout) // Cleanup on unmount
+  if (realtimeTimeout) clearTimeout(realtimeTimeout)
 })
 </script>
