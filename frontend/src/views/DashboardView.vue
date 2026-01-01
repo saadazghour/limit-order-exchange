@@ -120,7 +120,7 @@ const refreshData = () => {
 
 const displayToast = (message: string) => {
   if (toastTimeout) clearTimeout(toastTimeout) // Clear any existing timeout
-  
+
   toastMessage.value = message
   showToast.value = true
 
@@ -130,11 +130,15 @@ const displayToast = (message: string) => {
   }, 3000) // Hide after 3 seconds
 }
 
+let realtimeTimeout: ReturnType<typeof setTimeout> | null = null
+
 const setupRealtimeListener = (userId: number) => {
+  if (realtimeTimeout) clearTimeout(realtimeTimeout)
   echo.private(`user.${userId}`).listen(".OrderMatched", () => {
-    setTimeout(() => {
+    realtimeTimeout = setTimeout(() => {
       refreshData()
       displayToast("Order matched successfully!") // Display toast
+      realtimeTimeout = null
     }, 500)
   })
 }
@@ -153,5 +157,6 @@ onMounted(fetchProfile)
 onBeforeUnmount(() => {
   if (profile.value) echo.leave(`user.${profile.value.id}`)
   if (toastTimeout) clearTimeout(toastTimeout) // Cleanup on unmount
+  if (realtimeTimeout) clearTimeout(realtimeTimeout)
 })
 </script>
