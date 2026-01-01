@@ -101,6 +101,7 @@ const router = useRouter()
 const refreshTrigger = ref(0)
 const showToast = ref(false)
 const toastMessage = ref("")
+let toastTimeout: number | undefined
 
 const fetchProfile = async () => {
   try {
@@ -118,10 +119,14 @@ const refreshData = () => {
 }
 
 const displayToast = (message: string) => {
+  if (toastTimeout) clearTimeout(toastTimeout) // Clear any existing timeout
+  
   toastMessage.value = message
   showToast.value = true
-  setTimeout(() => {
+
+  toastTimeout = setTimeout(() => {
     showToast.value = false
+    toastTimeout = undefined
   }, 3000) // Hide after 3 seconds
 }
 
@@ -147,5 +152,6 @@ const logout = async () => {
 onMounted(fetchProfile)
 onBeforeUnmount(() => {
   if (profile.value) echo.leave(`user.${profile.value.id}`)
+  if (toastTimeout) clearTimeout(toastTimeout) // Cleanup on unmount
 })
 </script>
