@@ -88,6 +88,7 @@ interface Asset {
   amount: string
   locked_amount: string
 }
+
 interface Profile {
   id: number
   name: string
