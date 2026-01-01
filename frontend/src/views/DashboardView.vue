@@ -133,8 +133,10 @@ const displayToast = (message: string) => {
 let realtimeTimeout: ReturnType<typeof setTimeout> | null = null
 
 const setupRealtimeListener = (userId: number) => {
-  if (realtimeTimeout) clearTimeout(realtimeTimeout)
+  echo.leave(`user.${userId}`) // Unsubscribe before re-subscribing
   echo.private(`user.${userId}`).listen(".OrderMatched", () => {
+    if (realtimeTimeout) clearTimeout(realtimeTimeout)
+
     realtimeTimeout = setTimeout(() => {
       refreshData()
       displayToast("Order matched successfully!") // Display toast
