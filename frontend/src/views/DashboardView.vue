@@ -63,7 +63,7 @@
       </div>
       <!-- Toast Notification -->
       <div
-        v-if="showToast"
+        v-show="showToast"
         class="fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-md shadow-lg transition-opacity duration-500"
         :class="{ 'opacity-100': showToast, 'opacity-0': !showToast }"
       >
